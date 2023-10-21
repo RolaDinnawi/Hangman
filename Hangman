@@ -1,0 +1,79 @@
+import java.util.*;
+import java.io.*;
+
+public class HangMan {
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner input = new Scanner(System.in);
+        Scanner fromFile = new Scanner(new File("words.txt"));
+        ArrayList<String> wordsList = new ArrayList<>();
+
+        while (fromFile.hasNextLine()) {
+            wordsList.add(fromFile.nextLine());
+        }
+
+        Random random = new Random();
+        int number = random.nextInt(wordsList.size());
+        String word = wordsList.get(number);
+
+        int length = word.length();
+        int wrong = 7;
+        String wordLowerCase = word.toLowerCase();
+        String dash = "";
+
+        for (int i = 0; i < length; i++) {
+            if (wordLowerCase.charAt(i) == ' ')
+                dash += " ";
+            else
+                dash += "_";
+        }
+
+        System.out.println("Number of letters in the word to guess: " + length);
+        System.out.println(dash);
+
+        String guessed = "";
+
+        do {
+            if (!dash.contains("_")) {
+                System.out.println("You Won!");
+                break;
+            }
+
+            System.out.println("Number of guesses left: " + wrong);
+            System.out.println("Your guess?");
+
+            char letter = input.next().charAt(0);
+            int index = wordLowerCase.indexOf(letter);
+
+            if (index != -1) {
+                System.out.println("Good Guess!");
+                guessed += letter + " ";
+                StringBuilder build = new StringBuilder(dash);
+
+                do {
+                    build.setCharAt(index, letter);
+                    index = wordLowerCase.indexOf(letter, index + 1);
+                } while (index != -1 && index < length);
+
+                dash = build.toString();
+
+                System.out.println(dash);
+                System.out.println("Letters guessed so far: " + guessed);
+            } else {
+                System.out.println("Wrong guess!");
+                System.out.println(dash);
+                wrong -= 1;
+                guessed += letter + " ";
+                System.out.println("Letters guessed so far: " + guessed);
+            }
+
+        } while (wrong > 0);
+
+        if (wrong == 0) {
+            System.out.println("You lost!");
+            System.out.println("The word is " + wordLowerCase);
+        }
+
+        input.close();
+        fromFile.close();
+    }
+}
